@@ -1,0 +1,44 @@
+
+name: CI
+on:
+
+  push:
+    branches: [ main ]
+    
+jobs:
+  cypress-run:
+    runs-on: ubuntu-16.04
+    steps:
+      - name: Checkout
+      - uses: actions/checkout@v2
+
+      - name: Instalar as deps do server
+        uses: bahmutov/npm-install@v1
+        with:
+          working-directory: server
+      - name: Instalar as deps do server
+        uses: bahmutov/npm-install@v1
+        with:
+          working-directory: web
+      - name: Component & API & UI tESTS
+        uses: cypress-io/github-action@v2
+        with:
+          working-directory: web
+          install: false
+          start: npm run start:cli
+          wait-on: 'http://localhost:3000'
+      
+      - name: Upload screenshots
+        uses: actions/upload-artifact@v2.2.0 
+        if: failure{}
+        with:
+         name: screenshots
+         path: web/cypress/screenshots
+        
+        
+      - name: Upload videos
+        uses: actions/upload-artifact@v2.2.0 
+        if: always{}
+        with:
+         name: videos
+         path: web/cypress/videos
